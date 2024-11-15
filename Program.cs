@@ -86,7 +86,20 @@ class Program
             //LINQ vs SQL
             Console.WriteLine("Executing SQL Query: count students");
             var countStudents = context.Students.Count();
-            var countStudentsSql = context.Database.ExecuteSqlRaw("SELECT COUNT(*) FROM dbo.[Students]"); //bug
+            //var countStudentsSql = context.Database.ExecuteSqlRaw("SELECT COUNT(*) FROM dbo.[Students]"); //bug
+            //fixing bug
+            int countStudentsSql = context.Database.ExecuteSqlRaw("SELECT COUNT(*) FROM dbo.[Students]");
+            using (var command = context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM dbo.[Students]";
+                context.Database.OpenConnection();
+
+                using (var result = command.ExecuteReader())
+                {
+                    result.Read();
+                    countStudentsSql = result.GetInt32(0); //COUNT(*) to int
+                }
+            }
             Console.WriteLine($"Total number of students: {countStudents} or {countStudentsSql}");
 
             // utility class to database set
