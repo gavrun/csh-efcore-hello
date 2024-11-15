@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace csh_efcore_hello.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    [Migration("20241115210000_InitialCreate")]
+    [Migration("20241115221531_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -42,6 +42,18 @@ namespace csh_efcore_hello.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("StudentGroup", b =>
+                {
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Initial")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("StudentGroups");
                 });
 #pragma warning restore 612, 618
         }

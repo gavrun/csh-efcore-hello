@@ -42,15 +42,16 @@ class Program
 
             //read data
             var students = context.Students.ToList();
-            Console.WriteLine("Students:");
+            Console.WriteLine("Students list enrolled withing the last 30 days:");
 
             foreach (var student in students)
             {
                 Console.WriteLine($"ID: {student.Id}, Name: {student.Name}, Enrollment Date: {student.EnrollmentDate}");
             }
+            Console.WriteLine();
 
-            //run SQL query
-            Console.WriteLine("Executing SQL Query:\nSELECT * FROM Students WHERE Name LIKE '%Ja%'");
+            //run SQL query, call chain
+            Console.WriteLine("Executing SQL Query: find students with %Ja% in names");
             var sqlStudents = context.Students
                 .FromSqlRaw("SELECT * FROM dbo.[Students] WHERE Name LIKE '%Ja%'")
                 .ToList();
@@ -60,6 +61,45 @@ class Program
             {
                 Console.WriteLine($"ID: {student.Id}, Name: {student.Name}");
             }
+
+            // more stuff
+            Console.WriteLine("Executing SQL Query: find students enrolled in the last 3 days");
+            var recentStudents = context.Students
+                .FromSqlRaw("SELECT * FROM dbo.[Students] WHERE EnrollmentDate >= DATEADD(DAY, -3, GETDATE())")
+                .ToList();
+            Console.WriteLine("SQL Query Results:");
+            foreach (var student in recentStudents)
+            {
+                Console.WriteLine($"ID: {student.Id}, Name: {student.Name}, Enrollment Date: {student.EnrollmentDate}");
+            }
+
+            Console.WriteLine("Executing SQL Query: list newer students first");
+            var sortedStudents = context.Students
+                .FromSqlRaw("SELECT * FROM dbo.[Students] ORDER BY EnrollmentDate DESC")
+                .ToList();
+            Console.WriteLine("SQL Query Results:");
+            foreach (var student in sortedStudents)
+            {
+                Console.WriteLine($"ID: {student.Id}, Name: {student.Name}, Enrollment Date: {student.EnrollmentDate}");
+            }
+
+            //LINQ vs SQL
+            Console.WriteLine("Executing SQL Query: count students");
+            var countStudents = context.Students.Count();
+            var countStudentsSql = context.Database.ExecuteSqlRaw("SELECT COUNT(*) FROM dbo.[Students]"); //bug
+            Console.WriteLine($"Total number of students: {countStudents} or {countStudentsSql}");
+
+            // utility class to database set
+            Console.WriteLine("Executing SQL Query: group and count by first letter");
+            var groupedStudents = context.StudentGroups
+                .FromSqlRaw("SELECT LEFT(Name, 1) AS Initial, COUNT(*) AS Count FROM dbo.[Students] GROUP BY LEFT(Name, 1)")
+                .ToList();
+            Console.WriteLine("SQL Query Results:");
+            foreach (var studentGroup in groupedStudents)
+            {
+                Console.WriteLine($"Initial: {studentGroup.Initial}, Count: {studentGroup.Count}");
+            }
+
         }
     }
 }

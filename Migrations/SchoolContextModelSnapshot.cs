@@ -40,6 +40,18 @@ namespace csh_efcore_hello.Migrations
 
                     b.ToTable("Students");
                 });
+
+            modelBuilder.Entity("StudentGroup", b =>
+                {
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Initial")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("StudentGroups");
+                });
 #pragma warning restore 612, 618
         }
     }
