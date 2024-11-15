@@ -17,6 +17,11 @@ class Program
             // context.Students.Add(new Student { Name = "Jane Smith", EnrollmentDate = DateTime.Now.AddDays(-5) });
             // context.SaveChanges();
 
+            //clear table, reset index, reset identity
+            context.Students.RemoveRange(context.Students);
+            context.SaveChanges();
+            context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.[Students]', RESEED, 0)");
+
             //add data randomizing
             var firstNames = new[] { "John", "Jane", "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George", "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nina", "Oliver", "Paula", "Quincy", "Rachel" };
             var lastNames = new[] { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin" };
@@ -33,7 +38,6 @@ class Program
 
                     context.Students.Add(new Student { Name = fullName, EnrollmentDate = enrollmentDate });
                 }
-            
             context.SaveChanges();
 
             //read data
@@ -48,7 +52,7 @@ class Program
             //run SQL query
             Console.WriteLine("Executing SQL Query:\nSELECT * FROM Students WHERE Name LIKE '%Ja%'");
             var sqlStudents = context.Students
-                .FromSqlRaw("SELECT * FROM Students WHERE Name LIKE '%Ja%'")
+                .FromSqlRaw("SELECT * FROM dbo.[Students] WHERE Name LIKE '%Ja%'")
                 .ToList();
 
             Console.WriteLine("SQL Query Results:");
